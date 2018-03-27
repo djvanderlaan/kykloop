@@ -1,0 +1,15 @@
+{
+  "name": "kykloop",
+  "version": "0.0.1",
+  "description": "A Discord bot that controls a panning and tilting camera through Arduino",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "djvanderlaan",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "discord.js": "^11.3.2",
+    "serialport": "^6.1.1"
+  }
+}
