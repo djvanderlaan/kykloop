@@ -103,48 +103,52 @@ client.on('ready', () => {
 });
 
 client.on('message', msg => {
-  // ===== up/down/left/right
-  // Messages of the form "kyk left 10"
-  const turn_re = /^kyk[ ]+([a-z]+)[ ]+([0-9]+)[ ]*$/;
-  if (turn_re.test(msg.content)) {
-    let res = turn_re.exec(msg.content);
-    if (res[1] == 'up') {
-      kykloop.change_tilt(-res[2]);
-    } else if (res[1] == 'down') {
-      kykloop.change_tilt(+res[2]);
-    } else if (res[1] == 'left') {
-      kykloop.change_pan(+res[2]);
-    } else if (res[1] == 'right') {
-      kykloop.change_pan(-res[2]);
-    } else {
-      msg.reply("Unknown direction: '" + res[1] + "'.");
+  try {
+    // ===== up/down/left/right
+    // Messages of the form "kyk left 10"
+    const turn_re = /^kyk[ ]+([a-z]+)[ ]+([0-9]+)[ ]*$/;
+    if (turn_re.test(msg.content)) {
+      let res = turn_re.exec(msg.content);
+      if (res[1] == 'up') {
+        kykloop.change_tilt(-res[2]);
+      } else if (res[1] == 'down') {
+        kykloop.change_tilt(+res[2]);
+      } else if (res[1] == 'left') {
+        kykloop.change_pan(+res[2]);
+      } else if (res[1] == 'right') {
+        kykloop.change_pan(-res[2]);
+      } else {
+        msg.reply("Unknown direction: '" + res[1] + "'.");
+      }
+
+      msg.reply('Turning camera ' + res[1] + ' by ' + res[2] +
+        ' degrees (' + kykloop.pan() + ',' + kykloop.tilt() + ').');
     }
 
-    msg.reply('Turning camera ' + res[1] + ' by ' + res[2] +
-      ' degrees (' + kykloop.pan() + ',' + kykloop.tilt() + ').');
-  }
-
-  // ====== store prosition
-  // Message of the format "kyk store word"
-  const store_re = /^kyk[ ]+store[ ]+([a-z]+)[ ]*$/;
-  if (store_re.test(msg.content)) {
-    let res = store_re.exec(msg.content);
-    stored_positions[res[1]] = { 'pan' : kykloop.pan(), 'tilt': kykloop.tilt() };
-     msg.reply("Stored current position in '" + res[1], "'.")
-  }
-
-  // ======= retrieve prosition
-  // Message of the format "kyk word"
-  const retr_re = /^kyk[ ]+([a-z]+)[ ]*$/;
-  if (retr_re.test(msg.content)) {
-    let res = retr_re.exec(msg.content);
-    let pos = stored_positions[res[1]];
-    if (pos !== null) {
-      kykloop.tilt(pos.tilt).pan(pos.pan);
-      msg.reply("Moving to '" + res[1] + "'.")
-    } else {
-      msg.reply("Could not find stored position '" + res[1] + "'.")
+    // ====== store prosition
+    // Message of the format "kyk store word"
+    const store_re = /^kyk[ ]+store[ ]+([a-z]+)[ ]*$/;
+    if (store_re.test(msg.content)) {
+      let res = store_re.exec(msg.content);
+      stored_positions[res[1]] = { 'pan' : kykloop.pan(), 'tilt': kykloop.tilt() };
+       msg.reply("Stored current position in '" + res[1], "'.")
     }
+
+    // ======= retrieve prosition
+    // Message of the format "kyk word"
+    const retr_re = /^kyk[ ]+([a-z]+)[ ]*$/;
+    if (retr_re.test(msg.content)) {
+      let res = retr_re.exec(msg.content);
+      let pos = stored_positions[res[1]];
+      if (pos !== undefined && pos.tilt !== undefined && pos.pan !== undefined) {
+        kykloop.tilt(pos.tilt).pan(pos.pan);
+        msg.reply("Moving to '" + res[1] + "'.")
+      } else {
+        msg.reply("Could not find stored position '" + res[1] + "'.")
+      }
+    }
+  } catch (e) {
+    msg.reply("An error occured: " + e);
   }
   
 });
