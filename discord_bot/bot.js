@@ -5,7 +5,7 @@ const fs = require('fs');
 
 
 // ========= Kykloop class ================
-// Keeps track of the current pan and tilt and sends commands to the 
+// Keeps track of the current pan and tilt and sends commands to the
 // arduino device
 class Kykloop {
   constructor(device) {
@@ -21,7 +21,7 @@ class Kykloop {
   }
 
   tilt(angle) {
-    if (arguments.length === 0) 
+    if (arguments.length === 0)
       return this.tilt_;
     if (angle > 179) angle = 179;
     if (angle < 1) angle = 1;
@@ -37,14 +37,14 @@ class Kykloop {
     }
     return this;
   }
-  
+
   change_tilt(angle) {
     let new_tilt = this.tilt_ + (+angle);
     return this.tilt(new_tilt);
   }
 
   pan(angle) {
-    if (arguments.length === 0) 
+    if (arguments.length === 0)
       return this.pan_;
     if (angle > 179) angle = 179;
     if (angle < 1) angle = 1;
@@ -60,7 +60,7 @@ class Kykloop {
     }
     return this;
   }
-  
+
   change_pan(angle) {
     let new_pan = this.pan_ + (+angle);
     return this.pan(new_pan);
@@ -78,7 +78,7 @@ let port = 'test';
 for (p in possible_ports) {
   if (fs.existsSync(possible_ports[p])) {
     port = possible_ports[p];
-    break; 
+    break;
   }
 }
 if (port == 'test') {
@@ -96,6 +96,11 @@ const auth = require('./auth.json');
 const client = new Discord.Client();
 
 let stored_positions = {};
+if (fs.fileExistsSync('stored_positions.json')) {
+  stored_positions = JSON.parse(
+    fs.readFileSync('stored_positions.json', 'utf8')
+  );
+}
 
 
 client.on('ready', () => {
@@ -120,9 +125,31 @@ client.on('message', msg => {
       } else {
         msg.reply("Unknown direction: '" + res[1] + "'.");
       }
-
       msg.reply('Turning camera ' + res[1] + ' by ' + res[2] +
         ' degrees (' + kykloop.pan() + ',' + kykloop.tilt() + ').');
+    }
+
+    // ====== Shorthand notation
+    const short_re = /^([lLrRuUdD])[ ]?$/;
+    if (short_re.test(msg.content)) {
+      let res = short_re.exec(msg.content);
+      if (res[1] == 'l') {
+        kykloop.change_pan(5);
+      } else if (res[1] == 'L') {
+        kykloop.change_pan(10);
+      } else if (res[1] == 'r') {
+        kykloop.change_pan(-5);
+      } else if (res[1] == 'R') {
+        kykloop.change_pan(-10);
+      } else if (res[1] == 'd') {
+        kykloop.change_pan(5);
+      } else if (res[1] == 'D') {
+        kykloop.change_pan(10);
+      } else if (res[1] == 'u') {
+        kykloop.change_pan(-5);
+      } else if (res[1] == 'U') {
+        kykloop.change_pan(-10);
+      }
     }
 
     // ====== store prosition
@@ -131,7 +158,10 @@ client.on('message', msg => {
     if (store_re.test(msg.content)) {
       let res = store_re.exec(msg.content);
       stored_positions[res[1]] = { 'pan' : kykloop.pan(), 'tilt': kykloop.tilt() };
-       msg.reply("Stored current position in '" + res[1], "'.")
+      fs.writeFile('stored_positions.json',
+        JSON.stringify(stored_positions, null, 2) , 'utf-8'
+      );
+      msg.reply("Stored current position in '" + res[1], "'.")
     }
 
     // ======= retrieve prosition
@@ -150,8 +180,7 @@ client.on('message', msg => {
   } catch (e) {
     msg.reply("An error occured: " + e);
   }
-  
+
 });
 
 client.login(auth.token);
-
