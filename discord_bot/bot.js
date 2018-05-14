@@ -96,7 +96,7 @@ const auth = require('./auth.json');
 const client = new Discord.Client();
 
 let stored_positions = {};
-if (fs.fileExistsSync('stored_positions.json')) {
+if (fs.existsSync('stored_positions.json')) {
   stored_positions = JSON.parse(
     fs.readFileSync('stored_positions.json', 'utf8')
   );
@@ -135,20 +135,36 @@ client.on('message', msg => {
       let res = short_re.exec(msg.content);
       if (res[1] == 'l') {
         kykloop.change_pan(5);
+        msg.reply('Turning camera 5 degrees left (' + kykloop.pan() + ',' +
+          kykloop.tilt() + ').');
       } else if (res[1] == 'L') {
         kykloop.change_pan(10);
+        msg.reply('Turning camera 10 degrees left (' + kykloop.pan() + ',' +
+          kykloop.tilt() + ').');
       } else if (res[1] == 'r') {
         kykloop.change_pan(-5);
+        msg.reply('Turning camera 5 degrees right (' + kykloop.pan() + ',' +
+          kykloop.tilt() + ').');
       } else if (res[1] == 'R') {
         kykloop.change_pan(-10);
+        msg.reply('Turning camera 10 degrees right (' + kykloop.pan() + ',' +
+          kykloop.tilt() + ').');
       } else if (res[1] == 'd') {
-        kykloop.change_pan(5);
+        kykloop.change_tilt(5);
+        msg.reply('Turning camera 5 degrees down (' + kykloop.pan() + ',' +
+          kykloop.tilt() + ').');
       } else if (res[1] == 'D') {
-        kykloop.change_pan(10);
+        kykloop.change_tilt(10);
+        msg.reply('Turning camera 10 degrees down (' + kykloop.pan() + ',' +
+          kykloop.tilt() + ').');
       } else if (res[1] == 'u') {
-        kykloop.change_pan(-5);
+        kykloop.change_tilt(-5);
+        msg.reply('Turning camera 5 degrees up (' + kykloop.pan() + ',' +
+          kykloop.tilt() + ').');
       } else if (res[1] == 'U') {
-        kykloop.change_pan(-10);
+        kykloop.change_tilt(-10);
+        msg.reply('Turning camera 10 degrees up (' + kykloop.pan() + ',' +
+          kykloop.tilt() + ').');
       }
     }
 
