@@ -12,6 +12,8 @@ class Kykloop {
     this.device = device;
     this.pan_ = 90;
     this.tilt_ = 90;
+    this.angle_max_ = 170;
+    this.angle_min_ = 10;
     if (this.device != "test") {
       this.port = new SerialPort(this.device, {baudRate: 9600});
       this.port.on('error', function(err) {
@@ -23,8 +25,8 @@ class Kykloop {
   tilt(angle) {
     if (arguments.length === 0)
       return this.tilt_;
-    if (angle > 179) angle = 179;
-    if (angle < 1) angle = 1;
+    if (angle > this.angle_max_) angle = this.angle_max_;
+    if (angle < this.angle_min_) angle = this.angle_min_;
     this.tilt_ = angle;
     // send command to arduino
     let new_position = 't' + this.tilt_ + ';';
@@ -46,14 +48,15 @@ class Kykloop {
   pan(angle) {
     if (arguments.length === 0)
       return this.pan_;
-    if (angle > 179) angle = 179;
-    if (angle < 1) angle = 1;
+    if (angle > this.angle_max_) angle = this.angle_max_;
+    if (angle < this.angle_min_) angle = this.angle_min_;
     this.pan_ = angle;
     // send command to arduino
     let new_position = 'p' + this.pan_ + ';';
     if (this.device === "test") {
       console.log("Command to arduino: '" + new_position + "'");
     } else {
+      console.log("Command to arduino: '" + new_position + "'");
       this.port.write(String(new_position), function(err) {
         if (err) return console.log('Error on write: ', err.message);
       });
@@ -115,9 +118,9 @@ client.on('message', msg => {
     if (turn_re.test(msg.content)) {
       let res = turn_re.exec(msg.content);
       if (res[1] == 'up') {
-        kykloop.change_tilt(-res[2]);
-      } else if (res[1] == 'down') {
         kykloop.change_tilt(+res[2]);
+      } else if (res[1] == 'down') {
+        kykloop.change_tilt(-res[2]);
       } else if (res[1] == 'left') {
         kykloop.change_pan(+res[2]);
       } else if (res[1] == 'right') {
@@ -150,19 +153,19 @@ client.on('message', msg => {
         msg.reply('Turning camera 10 degrees right (' + kykloop.pan() + ',' +
           kykloop.tilt() + ').');
       } else if (res[1] == 'd') {
-        kykloop.change_tilt(5);
+        kykloop.change_tilt(-5);
         msg.reply('Turning camera 5 degrees down (' + kykloop.pan() + ',' +
           kykloop.tilt() + ').');
       } else if (res[1] == 'D') {
-        kykloop.change_tilt(10);
+        kykloop.change_tilt(-10);
         msg.reply('Turning camera 10 degrees down (' + kykloop.pan() + ',' +
           kykloop.tilt() + ').');
       } else if (res[1] == 'u') {
-        kykloop.change_tilt(-5);
+        kykloop.change_tilt(5);
         msg.reply('Turning camera 5 degrees up (' + kykloop.pan() + ',' +
           kykloop.tilt() + ').');
       } else if (res[1] == 'U') {
-        kykloop.change_tilt(-10);
+        kykloop.change_tilt(10);
         msg.reply('Turning camera 10 degrees up (' + kykloop.pan() + ',' +
           kykloop.tilt() + ').');
       }

@@ -2,5 +2,21 @@
   "center": {
     "pan": 90,
     "tilt": 90
+  },
+  "test": {
+    "pan": 80,
+    "tilt": 110
+  },
+  "foo": {
+    "pan": 40,
+    "tilt": 140
+  },
+  "jan": {
+    "pan": 150,
+    "tilt": 90
+  },
+  "tafel": {
+    "pan": 90,
+    "tilt": 50
   }
 }

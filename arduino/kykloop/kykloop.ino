@@ -3,15 +3,15 @@
 
 // Set the pin, max and minimum angles for the pan
 Servo serv_pan;
-const int PIN_PAN = 12;
+const int PIN_PAN = 9;
 const int MIN_PAN = 10;
 const int MAX_PAN = 170;
 
 // Set the pin, max and minimum angles for the tilt
 Servo serv_tilt;
-const int PIN_TILT = 9;
-const int MIN_TILT = 20;
-const int MAX_TILT = 90;
+const int PIN_TILT = 10;
+const int MIN_TILT = 10;
+const int MAX_TILT = 170;
 
 // Inititalise servos and set initial position to 90 degrees
 void setup() {
